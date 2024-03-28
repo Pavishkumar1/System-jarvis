@@ -9,8 +9,40 @@ def load_data(file):
 
 # Function to learn using Candidate Elimination Algorithm
 def learn(concepts, target):
-    # Implementation of the learning method
-    # Your existing learn function code goes here
+        # Initialise S0 with the first instance from concepts
+    specific_h = concepts[0].copy()
+
+    general_h = [["?" for _ in range(len(specific_h))] for _ in range(len(specific_h))]
+
+    # The learning iterations
+    for i, h in enumerate(concepts):
+
+        # Checking if the hypothesis has a positive target
+        if target[i] == "Yes":
+            for x in range(len(specific_h)):
+                # Change values in S & G only if values change
+                if h[x] != specific_h[x]:
+                    specific_h[x] = '?'
+                    general_h[x][x] = '?'
+
+        # Checking if the hypothesis has a negative target
+        if target[i] == "No":
+            for x in range(len(specific_h)):
+                # For negative hypothesis change values only in G
+                if h[x] != specific_h[x]:
+                    general_h[x][x] = specific_h[x]
+                else:
+                    general_h[x][x] = '?'
+
+    # Find indices where we have empty rows, meaning those that are unchanged
+    indices = [i for i, val in enumerate(general_h) if val == ['?'] * len(specific_h)]
+    for i in indices:
+        # Remove those rows from general_h
+        general_h.remove(['?'] * len(specific_h))
+    # Return final values
+    return specific_h, general_h
+
+
 
 # Streamlit app
 st.title('Candidate-Elimination Algorithm')
